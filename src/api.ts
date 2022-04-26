@@ -34,6 +34,23 @@ export interface Month {
   days: DaySummary[];
 }
 
+export interface Transaction {
+  /** Monetary value in cent. */
+  value: number;
+  /** Transaction text label. */
+  label?: string;
+  /** Transaction confirmed? */
+  confirmed?: Boolean;
+  /** Category */
+  category?: number;
+  /** Transaction date. */
+  transactionDate: Date,
+  /** Custom description. */
+  description?: string;
+  /** Book ID */
+  book?: number;
+}
+
 /**
  * Get a month summary.
  * @param year 1900 - 2199
@@ -44,4 +61,19 @@ export async function getMonth(year: number, month: number) {
   const yearMonthString = `${year}-${monthString}`;
   const url = `/months/${yearMonthString}`;
   return request.get<Month>(url);
+}
+
+/** Post a new transaciton */
+export async function postTransaction(data: Transaction) {
+  return request.post(`/transactions`, data);
+}
+
+/** Update a transaciton */
+export async function patchTransaction(data: Transaction) {
+  return request.patch(`/transactions`, data);
+}
+
+/** Delete a transaction */
+export async function deleteTransaction(id: number) {
+  return request.delete(`/transactions/${id}`);
 }
