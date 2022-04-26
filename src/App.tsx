@@ -1,10 +1,11 @@
 import { Add, ChevronLeft, ChevronRight, Menu } from "@mui/icons-material";
-import { AppBar, Box, Button, Card, CardActionArea, CardActions, CardContent, IconButton, Toolbar, Typography } from '@mui/material';
+import { AppBar, Box, Button, Card, CardActionArea, CardContent, Container, IconButton, Toolbar, Typography } from '@mui/material';
 import moment from 'moment';
 import { useEffect, useMemo, useState } from 'react';
 import { DaySummary, getMonth, Month, postTransaction } from "./api";
 import './App.css';
-import { onCloseParams, TransactionDialog } from "./TransactionDialog";
+import { DayDialog } from "./DayDialog";
+import { onSubmitParams, TransactionDialog } from "./TransactionDialog";
 
 interface DayCard {
   label: string;
@@ -30,6 +31,7 @@ function App() {
   const [dayCards, setDayCards] = useState<DayCard[]>([]);
   const [activeDate, setActiveDate] = useState<moment.Moment>(moment());
   const [addDialog, setAddDialog] = useState(false);
+  const [dayDialog, setDayDialog] = useState(false);
 
   /** Month data */
   const [month, setMonth] = useState<Month | null>(null);
@@ -83,7 +85,7 @@ function App() {
     setAddDialog(true);
   };
 
-  const submitAddTransaction = (params: onCloseParams) => {
+  const submitAddTransaction = (params: onSubmitParams) => {
     setAddDialog(false);
     (async () => {
       await postTransaction(params);
@@ -91,12 +93,13 @@ function App() {
     })();
   };
 
-  const showDayDialog = () => {
-
+  const showDayDialog = (date: Date) => {
+    setActiveDate(moment(date));
+    setDayDialog(true);
   };
 
   return (
-    <>
+    <Container>
       <Box sx={{display: "flex", flexDirection: "column"}}>
         <AppBar position="static">
           <Toolbar variant="regular">
@@ -128,28 +131,29 @@ function App() {
             }}
           >
             {headers.map(header => 
-              <Box key={header} sx={{textAlign: "center"}}>{header}</Box>
+              <Box key={header} sx={{py: 1, textAlign: "center"}}>{header}</Box>
             )}
             {dayCards.map(dayCard => 
-              <Card sx={{gridColumn: dayCard.dayOfWeek + 1}} key={dayCard.key}>
-                <CardActionArea onClick={showDayDialog}>
+              <Card variant="outlined" sx={{gridColumn: dayCard.dayOfWeek + 1}} key={dayCard.key}>
+                <CardActionArea onClick={()=>showDayDialog(dayCard.date)}>
                   <CardContent sx={{position: "relative"}}>
                     <Typography variant="subtitle1">{dayCard.label}</Typography>
                     <Typography variant="overline" gutterBottom>{Number(dayCard.value / 100).toFixed(2)}</Typography>
                   </CardContent>
                 </CardActionArea>
-                <CardActions>
-                  <IconButton onClick={() => showAddTransactionDialog(dayCard.date)} size="small" color="primary" aria-label="add transaction">
+                <Box textAlign="right">
+                  <IconButton onClick={()=>showAddTransactionDialog(dayCard.date)} size="small" color="primary" aria-label="add transaction">
                     <Add fontSize="inherit" />
                   </IconButton>
-                </CardActions>
+                </Box>
               </Card>
             )}
           </Box>
         </Box>
       </Box>
       <TransactionDialog open={addDialog} defaultDate={activeDate.toDate()} onClose={()=>setAddDialog(false)} onSubmit={submitAddTransaction} />
-    </>
+      <DayDialog open={dayDialog} defaultDate={activeDate.toDate()} onClose={()=>setDayDialog(false)} onChange={() => {setDayDialog(false); setActiveDate(moment());}} />
+    </Container>
   );
 }
 

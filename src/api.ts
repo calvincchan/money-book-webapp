@@ -35,6 +35,8 @@ export interface Month {
 }
 
 export interface Transaction {
+  /** Transaction ID */
+  _id?: number;
   /** Monetary value in cent. */
   value: number;
   /** Transaction text label. */
@@ -63,14 +65,24 @@ export async function getMonth(year: number, month: number) {
   return request.get<Month>(url);
 }
 
-/** Post a new transaciton */
+/** Get all transactions by date */
+export async function getTransactionsByDate(date: Date) {
+  return request.get<Transaction[]>(`/transactions`, {params: {day: date}});
+}
+
+/** Get one transaction */
+export async function getTransaction(id: number) {
+  return request.get<Transaction>(`/transactions/${id}`);
+}
+
+/** Post a new transaction */
 export async function postTransaction(data: Transaction) {
   return request.post(`/transactions`, data);
 }
 
 /** Update a transaciton */
-export async function patchTransaction(data: Transaction) {
-  return request.patch(`/transactions`, data);
+export async function patchTransaction(id: number, data: Transaction) {
+  return request.patch(`/transactions/${id}`, data);
 }
 
 /** Delete a transaction */

@@ -1,38 +1,51 @@
-import { Remove } from "@mui/icons-material";
+import { Check, Delete, Remove } from "@mui/icons-material";
 import { Button, Dialog, DialogActions, DialogContent, InputAdornment, Stack, TextField, Typography } from "@mui/material";
 import { DateTimePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { FunctionComponent, useEffect, useState } from "react";
-import { Transaction } from "./api";
+import { getTransaction } from "./api";
 
-export interface onCloseParams {
+export interface onSubmitParams {
   value: number;
   label: string;
   transactionDate: Date;
 }
 
 interface Props {
-  onSubmit: (transaction: onCloseParams) => void;
+  onSubmit?: (transaction: onSubmitParams) => void;
+  onDelete?: (id: number) => void;
   onClose: () => void;
   defaultDate: Date;
-  transaction?: Transaction;
+  transactionId?: number;
   open: boolean;
 }
 
 type TransactionType = "Expense" | "Income";
 
 export const TransactionDialog: FunctionComponent<Props> = (props) => {
-  const { onSubmit, onClose, defaultDate, open } = props;
+  const { onSubmit, onDelete, onClose, defaultDate, transactionId, open } = props;
   const [ value, setValue ] = useState("");
   const [ label, setLabel ] = useState("");
   const [ transactionDate, setTransactionDate ] = useState<Date>(new Date());
   const [ transactionType, setTransactionType ] = useState<TransactionType>("Expense");
 
   useEffect(() => {
-    console.log("open state changed", open);
-    setValue("");
-    setLabel("");
-    setTransactionDate(defaultDate);
+    if (open) {
+      if (transactionId) {
+        /** Editing existing transaction. */
+        (async() => {
+          const {data} = await getTransaction(transactionId);
+          setValue(Number(-data.value / 100).toFixed(2));
+          setLabel(data.label || "");
+          setTransactionDate(data.transactionDate);
+        })();
+      } else {
+        /** Creating a new transaction. */
+        setValue("");
+        setLabel("");
+        setTransactionDate(defaultDate);
+      }
+    }
   }, [defaultDate, open]);
 
   const handleSubmit = () => {
@@ -40,11 +53,17 @@ export const TransactionDialog: FunctionComponent<Props> = (props) => {
     if (transactionType === "Expense") {
       valueNumber = - valueNumber;
     }
-    onSubmit({ value: valueNumber, label, transactionDate });
+    onSubmit && onSubmit({ value: valueNumber, label, transactionDate });
   };
  
   const handleClose = () => {
     onClose();
+  };
+
+  const handleDelete = () => {
+    if (transactionId) {
+      onDelete && onDelete(transactionId);
+    }
   };
 
   function formatValue() {
@@ -63,7 +82,6 @@ export const TransactionDialog: FunctionComponent<Props> = (props) => {
           <Typography variant="subtitle1">Expense</Typography>
           <Stack>
             <TextField
-              autoFocus
               margin="normal"
               variant="filled"
               label="Value"
@@ -92,7 +110,8 @@ export const TransactionDialog: FunctionComponent<Props> = (props) => {
           </Stack>
         </DialogContent>
         <DialogActions>
-          <Button variant="contained" onClick={handleSubmit}>Add Transaction</Button>
+          {transactionId && <Button variant="contained" color="error" onClick={handleDelete} startIcon={<Delete />}>Delete</Button>}
+          <Button variant="contained" onClick={handleSubmit} startIcon={<Check />}>Save</Button>
         </DialogActions>
       </Dialog>
     </LocalizationProvider>
