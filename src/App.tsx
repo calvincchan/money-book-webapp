@@ -32,6 +32,7 @@ function App() {
   const [activeDate, setActiveDate] = useState<moment.Moment>(moment());
   const [addDialog, setAddDialog] = useState(false);
   const [dayDialog, setDayDialog] = useState(false);
+  const [reloader, setReloader] = useState(0);
 
   /** Month data */
   const [month, setMonth] = useState<Month | null>(null);
@@ -63,7 +64,7 @@ function App() {
         setDayCards(newDayCard);
       }
     })();
-  }, [activeDate]);
+  }, [activeDate, reloader]);
 
   const goPreviousMonth = () => {
     const newDate = moment(activeDate).subtract(1, "month");
@@ -85,17 +86,21 @@ function App() {
     setAddDialog(true);
   };
 
+  const showDayDialog = (date: Date) => {
+    setActiveDate(moment(date));
+    setDayDialog(true);
+  };
+
   const submitAddTransaction = (params: onSubmitParams) => {
     setAddDialog(false);
     (async () => {
       await postTransaction(params);
-      setActiveDate(moment());
+      reload();
     })();
   };
 
-  const showDayDialog = (date: Date) => {
-    setActiveDate(moment(date));
-    setDayDialog(true);
+  const reload = function() {
+    setReloader(reloader+1);
   };
 
   return (
@@ -152,7 +157,7 @@ function App() {
         </Box>
       </Box>
       <TransactionDialog open={addDialog} defaultDate={activeDate.toDate()} onClose={()=>setAddDialog(false)} onSubmit={submitAddTransaction} />
-      <DayDialog open={dayDialog} defaultDate={activeDate.toDate()} onClose={()=>setDayDialog(false)} onChange={() => {setDayDialog(false); setActiveDate(moment());}} />
+      <DayDialog open={dayDialog} defaultDate={activeDate.toDate()} onClose={()=>setDayDialog(false)} onChange={() => {setDayDialog(false); reload();}} />
     </Container>
   );
 }
