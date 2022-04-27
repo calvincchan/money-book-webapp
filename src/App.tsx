@@ -112,7 +112,7 @@ function App() {
               <Menu />
             </IconButton>
             <Typography variant="h6" color="inherit" component="div" sx={{ flexGrow: 1 }}>
-              Dollar Book ({month ? Number(month.closingBalance / 100).toFixed(2) : "--"})
+              Money Book ({month ? Number(month.closingBalance / 100).toFixed(2) : "--"})
             </Typography>
             <IconButton color="inherit" aria-label="menu" sx={{ mr: 2 }} onClick={goPreviousMonth}>
               <ChevronLeft />
