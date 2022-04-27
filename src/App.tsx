@@ -135,7 +135,7 @@ function App() {
             )}
             {dayCards.map(dayCard => 
               <Card variant="outlined" sx={{gridColumn: dayCard.dayOfWeek + 1}} key={dayCard.key}>
-                <CardActionArea onClick={()=>showDayDialog(dayCard.date)}>
+                <CardActionArea sx={{bgcolor: moment().isSame(dayCard.date, "day") ? "grey.300" : ""}} onClick={()=>showDayDialog(dayCard.date)}>
                   <CardContent sx={{position: "relative"}}>
                     <Typography variant="subtitle1">{dayCard.label}</Typography>
                     <Typography variant="overline" gutterBottom>{Number(dayCard.value / 100).toFixed(2)}</Typography>
