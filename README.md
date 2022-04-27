@@ -2,6 +2,8 @@
 
 This project is the frontend of Money Book. Please make sure to backend server is up and running.
 
+![Screenshot 1](./screenshot.png)
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Installation
