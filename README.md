@@ -1,6 +1,15 @@
-# Getting Started with Create React App
+# Getting Started with Money Book
+
+This project is the frontend of Money Book. Please make sure to backend server is up and running.
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+
+## Installation
+
+1. `yarn install`
+2. Edit `src/settings.ts` to match the correct base URL of the API server.
+3. `yarn start` for local development.
+4. `yarn build` to build distribution package.
 
 ## Available Scripts
 

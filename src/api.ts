@@ -1,9 +1,10 @@
 import axios from "axios";
+import settings from "./settings";
 
 const request = axios.create({
   timeout: 15000,
   headers: {},
-  baseURL: "http://0.0.0.0:50420"
+  baseURL: settings.baseURL
 });
 
 export interface DaySummary {
